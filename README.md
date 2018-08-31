@@ -12,7 +12,11 @@ The screen should look like :
 
 ![](screenshot.png)
 
+## Without authentication
+
 The first button allows to send a request to the raspberry pi and get the API status (UP or DOWN)
+
+## With authentication
 
 The second button allows to get the GPIO status (GPIO 17) to know the level is High (led is ON) or Low (led is OFF)
 
