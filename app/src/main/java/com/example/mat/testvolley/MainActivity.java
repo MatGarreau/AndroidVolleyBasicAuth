@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private Button switchoffGpioButton;
     private TextView resultsTextView;
     private Snackbar snackbar;
+    private String TAG = "APIRest";
 
     @Override    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,13 +66,13 @@ public class MainActivity extends AppCompatActivity
 
         // switch on gpio button
         switchonGpioButton = new Button(this);
-        switchonGpioButton.setText("Get GPIO status");
+        switchonGpioButton.setText("Switch ON");
         switchonGpioButton.setOnClickListener(this);
         switchonGpioButton.setId(R.id.bt_switchon_gpio);
 
         // switch off gpio button
         switchoffGpioButton = new Button(this);
-        switchoffGpioButton.setText("Get GPIO status");
+        switchoffGpioButton.setText("Switch OFF");
         switchoffGpioButton.setOnClickListener(this);
         switchoffGpioButton.setId(R.id.bt_switchoff_gpio);
 
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(apiStatusButton);
         linearLayout.addView(gpioStatusButton);
+        linearLayout.addView(switchonGpioButton);
+        linearLayout.addView(switchoffGpioButton);
         linearLayout.addView(resultsTextView);
     }
 
@@ -98,8 +101,8 @@ public class MainActivity extends AppCompatActivity
 
         switch (view.getId()) {
             case R.id.bt_get_api_status:
-                // do some stuff on getApiStatus button clicked
-                Log.i("API", "API get status button clicked");
+                // send a request to the Raspberry to know API Status (UP or DOWN)
+                Log.i(TAG, "API get status button clicked");
                 url = "http://192.168.1.29:8088/status";
                 StringRequest request = new StringRequest(Request.Method.GET, url,
                         this, this);
@@ -107,28 +110,13 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.bt_get_gpio_status:
-                // do some stuff on getGpioStatus button clicked
-                Log.i("API", "GPIO get status button clicked");
+                // get the gpio 17 status - if true the led is ON, if false the led is OFF
+                Log.i(TAG, "GPIO get status button clicked");
                 url = "http://192.168.1.29:8088/admin/gpiostatus/17";
                 // string request
-                StringRequest stringRequest = new StringRequest(Request.Method.GET , url, this, this
-//                        new Response.Listener<String>() {
-//                            @Override
-//                            public void onResponse(String response) {
-//                                resultsTextView.setText(response.toString());
-//                                snackbar.dismiss();
-//                            }
-//                        },
-//                        new Response.ErrorListener() {
-//                            @Override
-//                            public void onErrorResponse(VolleyError error) {
-//                                resultsTextView.setText("Erreur:"+error);
-//                                Log.i("GPIO", "onErrorResponse: "+ error);
-//                                snackbar.dismiss();
-//                            }
-//                        }
-                )
+                StringRequest stringRequest = new StringRequest(Request.Method.GET , url, this, this)
                 {
+                    // this methods allows to set request headers for basic authentication
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String> headers = new HashMap<>();
@@ -140,7 +128,48 @@ public class MainActivity extends AppCompatActivity
                     }
                 };
                 queue.add(stringRequest);
+                break;
 
+            case R.id.bt_switchon_gpio:
+                // send a request to the raspberry to switch on a led (on GPIO 17)
+                Log.i(TAG, "Switch on GPIO button clicked");
+                url = "http://192.168.1.29:8088/admin/switchongpio/17";
+                // string request
+                StringRequest switchonRequest = new StringRequest(Request.Method.PUT , url, this, this)
+                {
+                    // this methods allows to set request headers for basic authentication
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> headers = new HashMap<>();
+                        String credentials = "foo:bar";
+                        String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+//                        headers.put("Content-Type", "application/json");
+                        headers.put("Authorization", auth);
+                        return headers;
+                    }
+                };
+                queue.add(switchonRequest);
+                break;
+
+            case R.id.bt_switchoff_gpio:
+                // send a request to the raspberry to switch off a led (on GPIO 17)
+                Log.i(TAG, "Switch off GPIO button clicked");
+                url = "http://192.168.1.29:8088/admin/switchoffgpio/17";
+                // string request
+                StringRequest switchoffRequest = new StringRequest(Request.Method.PUT , url, this, this)
+                {
+                    // this methods allows to set request headers for basic authentication
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> headers = new HashMap<>();
+                        String credentials = "foo:bar";
+                        String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+//                        headers.put("Content-Type", "application/json");
+                        headers.put("Authorization", auth);
+                        return headers;
+                    }
+                };
+                queue.add(switchoffRequest);
                 break;
 
             default:
