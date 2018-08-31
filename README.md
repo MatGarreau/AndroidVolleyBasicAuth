@@ -6,6 +6,8 @@ this little Android application has been written to consume the API Rest develop
 
 [Go API Rest](https://github.com/MatGarreau/GoApiRestBasicAuth)
 
+I use Volley library to send simple HTTP request, and HTTP request that need authentication with Basic Authent.
+
 The screen should look like :
 
 ![](screenshot.png)
