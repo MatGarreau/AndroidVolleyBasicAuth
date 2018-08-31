@@ -7,6 +7,7 @@ this little Android application has been written to consume the API Rest develop
 [Go API Rest](https://github.com/MatGarreau/GoApiRestBasicAuth)
 
 The screen should look like :
+
 ![](screenshot.png)
 
 The first button allows to send a request to the raspberry pi and get the API status (UP or DOWN)
