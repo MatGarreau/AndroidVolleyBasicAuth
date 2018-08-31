@@ -18,18 +18,23 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /*
+* @Author : Mathieu GARREAU
+* @mail   : mat.garreau<at>gmail.com
 * this code is based on : https://www.supinfo.com/articles/single/2592-android-faire-requetes-http-simplement
  */
+
+
+// TODO :
+// create a function getStatus
+// manage only 1 button to switch on/off the led and change button color when led is on/off
+
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, Response.Listener<String>, Response.ErrorListener {
@@ -47,10 +52,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         makeView();
         setContentView(linearLayout);
-        snackbar = Snackbar.make(linearLayout, "Requête en cours d'exécution",
+        snackbar = Snackbar.make(linearLayout, "Request on going",
                 Snackbar.LENGTH_INDEFINITE);
     }
 
+    // this method generate the view : four buttons and a textView to display information (request response)
     private void makeView() {
         // api status button
         apiStatusButton = new Button(this);
@@ -90,13 +96,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if (!isConnected()) {
-            Snackbar.make(view, "Aucune connexion à internet.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(view, "Internet access is not available!", Snackbar.LENGTH_LONG).show();
             return;
         }
         snackbar.show();
 
         String url;
-        // String url = "http://httpbin.org/ip";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         switch (view.getId()) {
