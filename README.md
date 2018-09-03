@@ -18,9 +18,13 @@ The first button allows to send a request to the raspberry pi and get the API st
 
 ## With authentication
 
-The second button allows to get the GPIO status (GPIO 17) to know the level is High (led is ON) or Low (led is OFF)
+The second button allows following actions :
 
-The third button allows to switch ON the led on GPIO 17
+* get the GPIO status (GPIO 17) to know the level is High (led is ON) or Low (led is OFF)
 
-The fourth button allows to switch OFF the led on GPIO 17
+* switch ON the led
+
+* switch OFF the led
+
+
 
