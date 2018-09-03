@@ -33,8 +33,8 @@ import java.util.Map;
 
 
 // TODO :
-//
-//
+// manage 2 gpio
+// improve few functions to be more generic (require to manage many GPIO)
 
 
 public class MainActivity extends AppCompatActivity
@@ -42,12 +42,16 @@ public class MainActivity extends AppCompatActivity
 
     private LinearLayout linearLayout;
     private Button apiStatusButton;
-    private Button manageGpioButton;
+    private Button manageGpio17Button;
+    private Button manageGpio21Button;
     private TextView resultsTextView;
     private Snackbar snackbar;
     private String TAG = "APIRest";
     private String credentials = "foo:bar";
     private boolean gpioStatus;
+    private boolean gpio17Status;
+    private boolean gpio21Status;
+
     private String url;
     private RequestQueue queue;
 
@@ -62,7 +66,8 @@ public class MainActivity extends AppCompatActivity
     // this method generate the view : four buttons and a textView to display information (request response)
     private void makeView() {
         // check gpio status to set background color of the manageGpioButton
-        getGpioStatus();
+        getGpioStatus(17);
+        getGpioStatus(21);
 
         // api status button
         apiStatusButton = new Button(this);
@@ -70,18 +75,25 @@ public class MainActivity extends AppCompatActivity
         apiStatusButton.setOnClickListener(this);
         apiStatusButton.setId(R.id.bt_get_api_status);
 
-        // gpio status button
-        manageGpioButton = new Button(this);
-        manageGpioButton.setText("Get GPIO status");
-        manageGpioButton.setOnClickListener(this);
-        manageGpioButton.setId(R.id.bt_manage_gpio);
+        // gpio 17 button
+        manageGpio17Button = new Button(this);
+        manageGpio17Button.setText("Get GPIO 17 status");
+        manageGpio17Button.setOnClickListener(this);
+        manageGpio17Button.setId(R.id.bt_manage_gpio17);
+
+        // gpio 21 button
+        manageGpio21Button = new Button(this);
+        manageGpio21Button.setText("Get GPIO 21 status");
+        manageGpio21Button.setOnClickListener(this);
+        manageGpio21Button.setId(R.id.bt_manage_gpio21);
 
         resultsTextView = new TextView(this);
 
         linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(apiStatusButton);
-        linearLayout.addView(manageGpioButton);
+        linearLayout.addView(manageGpio17Button);
+        linearLayout.addView(manageGpio21Button);
         linearLayout.addView(resultsTextView);
     }
 
@@ -98,14 +110,25 @@ public class MainActivity extends AppCompatActivity
                 getApiStatus();
                 break;
 
-            case R.id.bt_manage_gpio:
+            case R.id.bt_manage_gpio17:
                 // manage possible actions on this button
-                if (gpioStatus) {
+                if (gpio17Status) {
                     // gpio status is true, so led is ON - user want to switch off
-                    switchOff();
+                    switchOff(17);
                 } else {
                     // gpio status is false, so led is OFF - user want to switch on
-                    switchOn();
+                    switchOn(17);
+                }
+                break;
+
+            case R.id.bt_manage_gpio21:
+                // manage possible actions on this button
+                if (gpio21Status) {
+                    // gpio status is true, so led is ON - user want to switch off
+                    switchOff(21);
+                } else {
+                    // gpio status is false, so led is OFF - user want to switch on
+                    switchOn(21);
                 }
                 break;
 
@@ -143,10 +166,10 @@ public class MainActivity extends AppCompatActivity
         queue.add(request);
     }
 
-    public void getGpioStatus(){
-        // get the gpio 17 status - if true the led is ON, if false the led is OFF
+    public void getGpioStatus(final int gpioNb){
+        // get the gpio <gpioNb> status - if true the led is ON, if false the led is OFF
         Log.i(TAG, "getGpioStatus has been called");
-        url = "http://192.168.1.29:8088/admin/gpiostatus/17";
+        url = "http://192.168.1.29:8088/admin/gpiostatus/"+gpioNb;
         // string request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -155,13 +178,31 @@ public class MainActivity extends AppCompatActivity
                         // should return true or false
                         gpioStatus = Boolean.parseBoolean(response);
                         Log.i(TAG, "getGpioStatus - onResponse: " + response);
-                        if (gpioStatus) {
-                            manageGpioButton.setBackgroundColor(Color.YELLOW);
-                            manageGpioButton.setText("put OFF");
-                        } else {
-                            manageGpioButton.setBackgroundColor(Color.BLUE);
-                            manageGpioButton.setText("put ON");
+                        switch (gpioNb) {
+                            case 17:
+                                gpio17Status = gpioStatus;
+                                if (gpio17Status) {
+                                    manageGpio17Button.setBackgroundColor(Color.YELLOW);
+                                    manageGpio17Button.setText("gpio17: put OFF");
+                                } else {
+                                    manageGpio17Button.setBackgroundColor(Color.BLUE);
+                                    manageGpio17Button.setText("gpio17: put ON");
+                                }
+                                break;
+
+                            case 21:
+                                gpio21Status = gpioStatus;
+                                if (gpio21Status) {
+                                    manageGpio21Button.setBackgroundColor(Color.YELLOW);
+                                    manageGpio21Button.setText("gpio21: put OFF");
+                                } else {
+                                    manageGpio21Button.setBackgroundColor(Color.BLUE);
+                                    manageGpio21Button.setText("gpio21: put ON");
+                                }
+                                break;
                         }
+
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -184,21 +225,32 @@ public class MainActivity extends AppCompatActivity
         queue.add(stringRequest);
     }
 
-    public void switchOn() {
+    public void switchOn(final int gpioNb) {
         // send a request to the raspberry to switch on a led (on GPIO 17)
         Log.i(TAG, "Switch on GPIO button clicked");
-        url = "http://192.168.1.29:8088/admin/switchongpio/17";
+        url = "http://192.168.1.29:8088/admin/switchongpio/"+gpioNb;
         // string request
         StringRequest switchonRequest = new StringRequest(Request.Method.PUT , url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // we consider that gpio (17) has been set to high level (led is ON)
-                        gpioStatus = true;
-                        manageGpioButton.setBackgroundColor(Color.YELLOW);
-                        manageGpioButton.setText("put OFF");
-                        resultsTextView.setText(response);
                         Log.i(TAG, "switchOn - onResponse: " + response);
+                        switch (gpioNb) {
+                            case 17:
+                                gpio17Status = true;
+                                manageGpio17Button.setBackgroundColor(Color.YELLOW);
+                                manageGpio17Button.setText("gpio17: put OFF");
+                                resultsTextView.setText(response);
+                                break;
+                            case 21:
+                                gpio21Status = true;
+                                manageGpio21Button.setBackgroundColor(Color.YELLOW);
+                                manageGpio21Button.setText("gpio21: put OFF");
+                                resultsTextView.setText(response);
+                                break;
+                        }
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -221,21 +273,32 @@ public class MainActivity extends AppCompatActivity
         queue.add(switchonRequest);
     }
 
-    public void switchOff(){
+    public void switchOff(final int gpioNb){
         // send a request to the raspberry to switch off a led (on GPIO 17)
         Log.i(TAG, "Switch off GPIO button clicked");
-        url = "http://192.168.1.29:8088/admin/switchoffgpio/17";
+        url = "http://192.168.1.29:8088/admin/switchoffgpio/"+gpioNb;
         // string request
         StringRequest switchoffRequest = new StringRequest(Request.Method.PUT , url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // we consider that gpio (17) has been set to low level (led is OFF)
-                        gpioStatus = false;
-                        manageGpioButton.setBackgroundColor(Color.BLUE);
-                        manageGpioButton.setText("put ON");
-                        resultsTextView.setText(response);
                         Log.i(TAG, "switchOff - onResponse: " + response);
+                        switch (gpioNb) {
+                            case 17:
+                                gpio17Status = false;
+                                manageGpio17Button.setBackgroundColor(Color.BLUE);
+                                manageGpio17Button.setText("gpio17: put ON");
+                                resultsTextView.setText(response);
+                                break;
+
+                            case 21:
+                                gpio21Status = false;
+                                manageGpio21Button.setBackgroundColor(Color.BLUE);
+                                manageGpio21Button.setText("gpio21: put ON");
+                                resultsTextView.setText(response);
+                                break;
+                        }
                     }
                 },
                 new Response.ErrorListener() {
