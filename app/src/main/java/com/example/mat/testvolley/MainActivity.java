@@ -42,9 +42,7 @@ public class MainActivity extends AppCompatActivity
 
     private LinearLayout linearLayout;
     private Button apiStatusButton;
-    private Button gpioStatusButton;
-//    private Button switchonGpioButton;
-//    private Button switchoffGpioButton;
+    private Button manageGpioButton;
     private TextView resultsTextView;
     private Snackbar snackbar;
     private String TAG = "APIRest";
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity
 
     // this method generate the view : four buttons and a textView to display information (request response)
     private void makeView() {
-        // check gpio status to set background color of the gpioStatusButton
+        // check gpio status to set background color of the manageGpioButton
         getGpioStatus();
 
         // api status button
@@ -73,31 +71,17 @@ public class MainActivity extends AppCompatActivity
         apiStatusButton.setId(R.id.bt_get_api_status);
 
         // gpio status button
-        gpioStatusButton = new Button(this);
-        gpioStatusButton.setText("Get GPIO status");
-        gpioStatusButton.setOnClickListener(this);
-        gpioStatusButton.setId(R.id.bt_manage_gpio);
-
-//        // switch on gpio button
-//        switchonGpioButton = new Button(this);
-//        switchonGpioButton.setText("Switch ON");
-//        switchonGpioButton.setOnClickListener(this);
-//        switchonGpioButton.setId(R.id.bt_switchon_gpio);
-//
-//        // switch off gpio button
-//        switchoffGpioButton = new Button(this);
-//        switchoffGpioButton.setText("Switch OFF");
-//        switchoffGpioButton.setOnClickListener(this);
-//        switchoffGpioButton.setId(R.id.bt_switchoff_gpio);
+        manageGpioButton = new Button(this);
+        manageGpioButton.setText("Get GPIO status");
+        manageGpioButton.setOnClickListener(this);
+        manageGpioButton.setId(R.id.bt_manage_gpio);
 
         resultsTextView = new TextView(this);
 
         linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(apiStatusButton);
-        linearLayout.addView(gpioStatusButton);
-//        linearLayout.addView(switchonGpioButton);
-//        linearLayout.addView(switchoffGpioButton);
+        linearLayout.addView(manageGpioButton);
         linearLayout.addView(resultsTextView);
     }
 
@@ -124,16 +108,6 @@ public class MainActivity extends AppCompatActivity
                     switchOn();
                 }
                 break;
-
-//            case R.id.bt_switchon_gpio:
-//                // send a request to the raspberry to switch on a led (on GPIO 17)
-//                switchOn();
-//                break;
-//
-//            case R.id.bt_switchoff_gpio:
-//                // send a request to the raspberry to switch off a led (on GPIO 17)
-//                switchOff();
-//                break;
 
             default:
                 break;
@@ -182,11 +156,11 @@ public class MainActivity extends AppCompatActivity
                         gpioStatus = Boolean.parseBoolean(response);
                         Log.i(TAG, "getGpioStatus - onResponse: " + response);
                         if (gpioStatus) {
-                            gpioStatusButton.setBackgroundColor(Color.YELLOW);
-                            gpioStatusButton.setText("put OFF");
+                            manageGpioButton.setBackgroundColor(Color.YELLOW);
+                            manageGpioButton.setText("put OFF");
                         } else {
-                            gpioStatusButton.setBackgroundColor(Color.BLUE);
-                            gpioStatusButton.setText("put ON");
+                            manageGpioButton.setBackgroundColor(Color.BLUE);
+                            manageGpioButton.setText("put ON");
                         }
                     }
                 },
@@ -221,8 +195,9 @@ public class MainActivity extends AppCompatActivity
                     public void onResponse(String response) {
                         // we consider that gpio (17) has been set to high level (led is ON)
                         gpioStatus = true;
-                        gpioStatusButton.setBackgroundColor(Color.YELLOW);
-                        gpioStatusButton.setText("put OFF");
+                        manageGpioButton.setBackgroundColor(Color.YELLOW);
+                        manageGpioButton.setText("put OFF");
+                        resultsTextView.setText(response);
                         Log.i(TAG, "switchOn - onResponse: " + response);
                     }
                 },
@@ -257,8 +232,9 @@ public class MainActivity extends AppCompatActivity
                     public void onResponse(String response) {
                         // we consider that gpio (17) has been set to low level (led is OFF)
                         gpioStatus = false;
-                        gpioStatusButton.setBackgroundColor(Color.BLUE);
-                        gpioStatusButton.setText("put ON");
+                        manageGpioButton.setBackgroundColor(Color.BLUE);
+                        manageGpioButton.setText("put ON");
+                        resultsTextView.setText(response);
                         Log.i(TAG, "switchOff - onResponse: " + response);
                     }
                 },
