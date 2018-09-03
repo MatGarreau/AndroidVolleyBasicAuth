@@ -33,8 +33,8 @@ import java.util.Map;
 
 
 // TODO :
-// create a function getStatus
-// manage only 1 button to switch on/off the led and change button color when led is on/off
+//
+//
 
 
 public class MainActivity extends AppCompatActivity
