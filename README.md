@@ -26,5 +26,9 @@ The second button allows following actions :
 
 * switch OFF the led
 
+# v2.1
+
+* manage many GPIOs
+
 
 
