@@ -10,7 +10,7 @@ I use Volley library to send simple HTTP request, and HTTP request that need aut
 
 The screen should look like :
 
-![](screenshot2.png)
+![](screenshot.png)
 
 ## Without authentication
 

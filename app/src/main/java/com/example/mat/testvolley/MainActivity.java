@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity
             default:
                 break;
         }
-
     }
 
     private boolean isConnected() {
@@ -201,8 +200,6 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 break;
                         }
-
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -250,7 +247,6 @@ public class MainActivity extends AppCompatActivity
                                 resultsTextView.setText(response);
                                 break;
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
