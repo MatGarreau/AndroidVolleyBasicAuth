@@ -201,8 +201,6 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 break;
                         }
-
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -250,7 +248,6 @@ public class MainActivity extends AppCompatActivity
                                 resultsTextView.setText(response);
                                 break;
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
