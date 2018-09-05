@@ -26,9 +26,9 @@ The second button allows following actions :
 
 * switch OFF the led
 
-# v2.1
+# v0.23
 
-* manage many GPIOs
+* use ImageButton widget rather than Button
 
 
 

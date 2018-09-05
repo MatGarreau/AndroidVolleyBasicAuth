@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item type="id" name="tv_message" />
     <item type="id" name="bt_get_api_status" />
     <item type="id" name="bt_manage_gpio17" />
     <item type="id" name="bt_manage_gpio21" />
-    <item type="id" name="bt_switchon_gpio" />
-    <item type="id" name="bt_switchoff_gpio" />
 </resources>

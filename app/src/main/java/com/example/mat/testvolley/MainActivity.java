@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -33,14 +34,13 @@ import java.util.Map;
 
 
 // TODO :
-// manage 2 gpio
-// improve few functions to be more generic (require to manage many GPIO)
-
+// use ImageButton widget rather than Button
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener {
 
     private LinearLayout linearLayout;
+    private RelativeLayout relativeLayout;
     private Button apiStatusButton;
     private Button manageGpio17Button;
     private Button manageGpio21Button;
@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         queue = Volley.newRequestQueue(this);
         makeView();
-        setContentView(linearLayout);
+        //setContentView(linearLayout);
+        setContentView(relativeLayout);
     }
 
     // this method generate the view : four buttons and a textView to display information (request response)
@@ -87,20 +88,38 @@ public class MainActivity extends AppCompatActivity
         manageGpio21Button.setOnClickListener(this);
         manageGpio21Button.setId(R.id.bt_manage_gpio21);
 
+        // text view to display server response
         resultsTextView = new TextView(this);
+        resultsTextView.setId(R.id.tv_message);
 
+        // this is the parent layout. It contains linearLayout and resultsTextView
+        relativeLayout = new RelativeLayout(this);
+
+        // this layout contains the GPIOs buttons
         linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(apiStatusButton);
         linearLayout.addView(manageGpio17Button);
         linearLayout.addView(manageGpio21Button);
-        linearLayout.addView(resultsTextView);
+
+        // add linearLayout (buttons) and text view to parent layout
+        relativeLayout.addView(linearLayout);
+        relativeLayout.addView(resultsTextView);
+
+        RelativeLayout.LayoutParams tvParam = (RelativeLayout.LayoutParams) resultsTextView.getLayoutParams();
+        tvParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        resultsTextView.setLayoutParams(tvParam);
+
+        RelativeLayout.LayoutParams llParam = (RelativeLayout.LayoutParams) linearLayout.getLayoutParams();
+//        llParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+        llParam.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        linearLayout.setLayoutParams(llParam);
     }
 
     @Override
     public void onClick(View view) {
         if (!isConnected()) {
-            Snackbar.make(view, "Internet access is not available!", Snackbar.LENGTH_LONG).show();
+            snackbar.make(view, "Internet access is not available!", snackbar.LENGTH_LONG).show();
             return;
         }
 
