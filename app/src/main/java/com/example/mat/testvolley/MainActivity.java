@@ -1,7 +1,6 @@
 package com.example.mat.testvolley;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -9,8 +8,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,23 +35,28 @@ import java.util.Map;
 
 
 // TODO :
+// improve layout management
 // use ImageButton widget rather than Button
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener {
 
-    private LinearLayout linearLayout;
-    private RelativeLayout relativeLayout;
-    private Button apiStatusButton;
-    private Button manageGpio17Button;
-    private Button manageGpio21Button;
-    private TextView resultsTextView;
-    private Snackbar snackbar;
-    private String TAG = "APIRest";
     private String credentials = "foo:bar";
+    private String TAG = "APIRest";
+    private RelativeLayout relativeLayout;
+    private LinearLayout linearLayout;
+    private LinearLayout gpio17Layout;
+    private LinearLayout gpio21Layout;
+    private Button apiStatusButton;
+    private ImageButton gpio17Button;
+    private ImageButton gpio21Button;
+    private TextView gpio17Label;
+    private TextView gpio21Label;
+    private TextView resultsTextView;
     private boolean gpioStatus;
     private boolean gpio17Status;
     private boolean gpio21Status;
+    private Snackbar snackbar;
 
     private String url;
     private RequestQueue queue;
@@ -60,7 +66,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         queue = Volley.newRequestQueue(this);
         makeView();
-        //setContentView(linearLayout);
         setContentView(relativeLayout);
     }
 
@@ -77,16 +82,35 @@ public class MainActivity extends AppCompatActivity
         apiStatusButton.setId(R.id.bt_get_api_status);
 
         // gpio 17 button
-        manageGpio17Button = new Button(this);
-        manageGpio17Button.setText("Get GPIO 17 status");
-        manageGpio17Button.setOnClickListener(this);
-        manageGpio17Button.setId(R.id.bt_manage_gpio17);
+        gpio17Button = new ImageButton(this);
+        gpio17Button.setBackgroundResource(R.drawable.bulbonmicro);
+        gpio17Button.setOnClickListener(this);
+        gpio17Button.setId(R.id.bt_manage_gpio17);
+        // gpio 17 label
+        gpio17Label = new TextView(this);
+        gpio17Label.setText("gpio 17");
+        // linear layout gpio17
+        gpio17Layout = new LinearLayout(this);
+        gpio17Layout.setOrientation(LinearLayout.HORIZONTAL);
+        gpio17Layout.addView(gpio17Label);
+        gpio17Layout.addView(gpio17Button);
+        gpio17Layout.setVerticalGravity(Gravity.CENTER);
+
 
         // gpio 21 button
-        manageGpio21Button = new Button(this);
-        manageGpio21Button.setText("Get GPIO 21 status");
-        manageGpio21Button.setOnClickListener(this);
-        manageGpio21Button.setId(R.id.bt_manage_gpio21);
+        gpio21Button = new ImageButton(this);
+        gpio17Button.setBackgroundResource(R.drawable.bulbonmicro);
+        gpio21Button.setOnClickListener(this);
+        gpio21Button.setId(R.id.bt_manage_gpio21);
+        // gpio 21 label
+        gpio21Label = new TextView(this);
+        gpio21Label.setText("gpio 21");
+        // linear layout gpio 21
+        gpio21Layout = new LinearLayout(this);
+        gpio21Layout.setOrientation(LinearLayout.HORIZONTAL);
+        gpio21Layout.addView(gpio21Label);
+        gpio21Layout.addView(gpio21Button);
+        gpio21Layout.setVerticalGravity(Gravity.CENTER);
 
         // text view to display server response
         resultsTextView = new TextView(this);
@@ -99,8 +123,8 @@ public class MainActivity extends AppCompatActivity
         linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(apiStatusButton);
-        linearLayout.addView(manageGpio17Button);
-        linearLayout.addView(manageGpio21Button);
+        linearLayout.addView(gpio17Layout);
+        linearLayout.addView(gpio21Layout);
 
         // add linearLayout (buttons) and text view to parent layout
         relativeLayout.addView(linearLayout);
@@ -111,7 +135,6 @@ public class MainActivity extends AppCompatActivity
         resultsTextView.setLayoutParams(tvParam);
 
         RelativeLayout.LayoutParams llParam = (RelativeLayout.LayoutParams) linearLayout.getLayoutParams();
-//        llParam.addRule(RelativeLayout.CENTER_IN_PARENT);
         llParam.addRule(RelativeLayout.CENTER_HORIZONTAL);
         linearLayout.setLayoutParams(llParam);
     }
@@ -154,7 +177,6 @@ public class MainActivity extends AppCompatActivity
             default:
                 break;
         }
-
     }
 
     private boolean isConnected() {
@@ -201,27 +223,21 @@ public class MainActivity extends AppCompatActivity
                             case 17:
                                 gpio17Status = gpioStatus;
                                 if (gpio17Status) {
-                                    manageGpio17Button.setBackgroundColor(Color.YELLOW);
-                                    manageGpio17Button.setText("gpio17: put OFF");
+                                    gpio17Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 } else {
-                                    manageGpio17Button.setBackgroundColor(Color.BLUE);
-                                    manageGpio17Button.setText("gpio17: put ON");
+                                    gpio17Button.setBackgroundResource(R.drawable.bulboffmicro);
                                 }
                                 break;
 
                             case 21:
                                 gpio21Status = gpioStatus;
                                 if (gpio21Status) {
-                                    manageGpio21Button.setBackgroundColor(Color.YELLOW);
-                                    manageGpio21Button.setText("gpio21: put OFF");
+                                    gpio21Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 } else {
-                                    manageGpio21Button.setBackgroundColor(Color.BLUE);
-                                    manageGpio21Button.setText("gpio21: put ON");
+                                    gpio21Button.setBackgroundResource(R.drawable.bulboffmicro);
                                 }
                                 break;
                         }
-
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -258,18 +274,15 @@ public class MainActivity extends AppCompatActivity
                         switch (gpioNb) {
                             case 17:
                                 gpio17Status = true;
-                                manageGpio17Button.setBackgroundColor(Color.YELLOW);
-                                manageGpio17Button.setText("gpio17: put OFF");
+                                gpio17Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 resultsTextView.setText(response);
                                 break;
                             case 21:
                                 gpio21Status = true;
-                                manageGpio21Button.setBackgroundColor(Color.YELLOW);
-                                manageGpio21Button.setText("gpio21: put OFF");
+                                gpio21Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 resultsTextView.setText(response);
                                 break;
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -306,15 +319,13 @@ public class MainActivity extends AppCompatActivity
                         switch (gpioNb) {
                             case 17:
                                 gpio17Status = false;
-                                manageGpio17Button.setBackgroundColor(Color.BLUE);
-                                manageGpio17Button.setText("gpio17: put ON");
+                                gpio17Button.setBackgroundResource(R.drawable.bulboffmicro);
                                 resultsTextView.setText(response);
                                 break;
 
                             case 21:
                                 gpio21Status = false;
-                                manageGpio21Button.setBackgroundColor(Color.BLUE);
-                                manageGpio21Button.setText("gpio21: put ON");
+                                gpio21Button.setBackgroundResource(R.drawable.bulboffmicro);
                                 resultsTextView.setText(response);
                                 break;
                         }

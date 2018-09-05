@@ -10,7 +10,7 @@ I use Volley library to send simple HTTP request, and HTTP request that need aut
 
 The screen should look like :
 
-![](screenshot2.png)
+![](screenshot.png)
 
 ## Without authentication
 
@@ -18,9 +18,9 @@ The first button allows to send a request to the raspberry pi and get the API st
 
 ## With authentication
 
-The second button allows following actions :
+The bulb buttons allows following actions :
 
-* get the GPIO status (GPIO 17) to know the level is High (led is ON) or Low (led is OFF)
+* get the GPIO status : led is ON or OFF
 
 * switch ON the led
 
