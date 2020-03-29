@@ -4,4 +4,5 @@
     <item type="id" name="bt_get_api_status" />
     <item type="id" name="bt_manage_gpio17" />
     <item type="id" name="bt_manage_gpio21" />
+    <item type="id" name="bt_manage_gpio27" />
 </resources>

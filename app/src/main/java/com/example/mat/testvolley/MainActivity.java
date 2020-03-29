@@ -36,7 +36,6 @@ import java.util.Map;
 
 // TODO :
 // improve layout management
-// use ImageButton widget rather than Button
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener {
@@ -47,15 +46,19 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout linearLayout;
     private LinearLayout gpio17Layout;
     private LinearLayout gpio21Layout;
+    private LinearLayout gpio27Layout;
     private Button apiStatusButton;
     private ImageButton gpio17Button;
     private ImageButton gpio21Button;
+    private ImageButton gpio27Button;
     private TextView gpio17Label;
     private TextView gpio21Label;
+    private TextView gpio27Label;
     private TextView resultsTextView;
     private boolean gpioStatus;
     private boolean gpio17Status;
     private boolean gpio21Status;
+    private boolean gpio27Status;
     private Snackbar snackbar;
 
     private String url;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         queue = Volley.newRequestQueue(this);
+       // gpio17Status = getGpioStatus(17);
         makeView();
         setContentView(relativeLayout);
     }
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         // check gpio status to set background color of the manageGpioButton
         getGpioStatus(17);
         getGpioStatus(21);
+        getGpioStatus(27);
 
         // api status button
         apiStatusButton = new Button(this);
@@ -99,7 +104,7 @@ public class MainActivity extends AppCompatActivity
 
         // gpio 21 button
         gpio21Button = new ImageButton(this);
-        gpio17Button.setBackgroundResource(R.drawable.bulbonmicro);
+        gpio21Button.setBackgroundResource(R.drawable.bulbonmicro);
         gpio21Button.setOnClickListener(this);
         gpio21Button.setId(R.id.bt_manage_gpio21);
         // gpio 21 label
@@ -111,6 +116,24 @@ public class MainActivity extends AppCompatActivity
         gpio21Layout.addView(gpio21Label);
         gpio21Layout.addView(gpio21Button);
         gpio21Layout.setVerticalGravity(Gravity.CENTER);
+
+
+        // gpio 27 button
+        gpio27Button = new ImageButton(this);
+        gpio27Button.setBackgroundResource(R.drawable.bulbonmicro);
+        gpio27Button.setOnClickListener(this);
+        gpio27Button.setId(R.id.bt_manage_gpio27);
+        // gpio 27 label
+        gpio27Label = new TextView(this);
+        gpio27Label.setText("gpio 27");
+        // linear layout gpio 27
+        gpio27Layout = new LinearLayout(this);
+        gpio27Layout.setOrientation(LinearLayout.HORIZONTAL);
+        gpio27Layout.addView(gpio27Label);
+        gpio27Layout.addView(gpio27Button);
+        gpio27Layout.setVerticalGravity(Gravity.CENTER);
+
+
 
         // text view to display server response
         resultsTextView = new TextView(this);
@@ -125,6 +148,7 @@ public class MainActivity extends AppCompatActivity
         linearLayout.addView(apiStatusButton);
         linearLayout.addView(gpio17Layout);
         linearLayout.addView(gpio21Layout);
+        linearLayout.addView(gpio27Layout);
 
         // add linearLayout (buttons) and text view to parent layout
         relativeLayout.addView(linearLayout);
@@ -174,6 +198,17 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
 
+            case R.id.bt_manage_gpio27:
+                // manage possible actions on this button - orders are reversed because of use of relay
+                if (gpio27Status) {
+                    // gpio status is true, so led is OFF - user want to switch on
+                    switchOff(27); // light on the light bulb
+                } else {
+                    // gpio status is false, so led is ON - user want to switch off
+                    switchOn(27); // light off the light bulb
+                }
+                break;
+
             default:
                 break;
         }
@@ -189,7 +224,8 @@ public class MainActivity extends AppCompatActivity
     public void getApiStatus(){
         // send a request to the Raspberry to know API Status (UP or DOWN)
         Log.i(TAG, "API get status button clicked");
-        url = "http://192.168.1.29:8088/status";
+        // url must be updated each time your raspberry got a new @IP !
+        url = "http://192.168.1.27:8088/status";
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -210,7 +246,7 @@ public class MainActivity extends AppCompatActivity
     public void getGpioStatus(final int gpioNb){
         // get the gpio <gpioNb> status - if true the led is ON, if false the led is OFF
         Log.i(TAG, "getGpioStatus has been called");
-        url = "http://192.168.1.29:8088/admin/gpiostatus/"+gpioNb;
+        url = "http://192.168.1.27:8088/admin/gpiostatus/"+gpioNb;
         // string request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -235,6 +271,15 @@ public class MainActivity extends AppCompatActivity
                                     gpio21Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 } else {
                                     gpio21Button.setBackgroundResource(R.drawable.bulboffmicro);
+                                }
+                                break;
+
+                            case 27:
+                                gpio27Status = gpioStatus;
+                                if (gpio27Status) {
+                                    gpio27Button.setBackgroundResource(R.drawable.bulboffmicro);
+                                } else {
+                                    gpio27Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 }
                                 break;
                         }
@@ -263,7 +308,7 @@ public class MainActivity extends AppCompatActivity
     public void switchOn(final int gpioNb) {
         // send a request to the raspberry to switch on a led (on GPIO 17)
         Log.i(TAG, "Switch on GPIO button clicked");
-        url = "http://192.168.1.29:8088/admin/switchongpio/"+gpioNb;
+        url = "http://192.168.1.27:8088/admin/switchongpio/"+gpioNb;
         // string request
         StringRequest switchonRequest = new StringRequest(Request.Method.PUT , url,
                 new Response.Listener<String>() {
@@ -277,9 +322,16 @@ public class MainActivity extends AppCompatActivity
                                 gpio17Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 resultsTextView.setText(response);
                                 break;
+
                             case 21:
                                 gpio21Status = true;
                                 gpio21Button.setBackgroundResource(R.drawable.bulbonmicro);
+                                resultsTextView.setText(response);
+                                break;
+
+                            case 27:
+                                gpio27Status = true;
+                                gpio27Button.setBackgroundResource(R.drawable.bulboffmicro);
                                 resultsTextView.setText(response);
                                 break;
                         }
@@ -308,7 +360,7 @@ public class MainActivity extends AppCompatActivity
     public void switchOff(final int gpioNb){
         // send a request to the raspberry to switch off a led (on GPIO 17)
         Log.i(TAG, "Switch off GPIO button clicked");
-        url = "http://192.168.1.29:8088/admin/switchoffgpio/"+gpioNb;
+        url = "http://192.168.1.27:8088/admin/switchoffgpio/"+gpioNb;
         // string request
         StringRequest switchoffRequest = new StringRequest(Request.Method.PUT , url,
                 new Response.Listener<String>() {
@@ -326,6 +378,12 @@ public class MainActivity extends AppCompatActivity
                             case 21:
                                 gpio21Status = false;
                                 gpio21Button.setBackgroundResource(R.drawable.bulboffmicro);
+                                resultsTextView.setText(response);
+                                break;
+
+                            case 27:
+                                gpio27Status = false;
+                                gpio27Button.setBackgroundResource(R.drawable.bulbonmicro);
                                 resultsTextView.setText(response);
                                 break;
                         }
